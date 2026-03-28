@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.eggs/
+build/
+dist/
+*.egg-info/
+.venv/
+venv/
+
+# Robot Framework / Browser Library
+log.html
+report.html
+output.xml
+playwright-log.txt
+rfbrowser.log
+*.png
+*.log
+*.output
+pabot_results/
+results/
+browser/
+
+# Allure
+allure-results/
+allure-report/
+
+# Arquivos temporarios
+find_selectors.js
+
+# Editor / OS
+.DS_Store
+.idea/
+*.swp
+*.swo
+.vscode/*
+!.vscode/mcp.json

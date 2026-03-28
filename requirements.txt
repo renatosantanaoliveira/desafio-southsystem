@@ -1,0 +1,5 @@
+robotframework==7.4.2
+robotframework-browser==19.12.7
+robotframework-requests==0.9.7
+allure-robotframework==2.15.3
+PyYAML==6.0.3

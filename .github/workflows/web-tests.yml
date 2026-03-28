@@ -1,0 +1,71 @@
+name: Testes Web
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  web-tests:
+    runs-on: ubuntu-latest
+    env:
+      ENV: qa
+      BROWSER: chromium
+      HEADLESS: True
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependências
+        run: python -m pip install -r requirements.txt
+
+      - name: Inicializar Playwright
+        run: rfbrowser init ${BROWSER}
+
+      - name: Executar testes com Allure
+        run: |
+          robot \
+            --variable ENV:${ENV} \
+            --variable BROWSER:${BROWSER} \
+            --variable HEADLESS:${HEADLESS} \
+            --listener allure_robotframework:allure-results \
+            --outputdir results \
+            --loglevel DEBUG \
+            web-tests/tests/
+
+      - name: Upload resultados Robot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-results-web
+          path: results/
+
+      - name: Setup Java (Allure CLI)
+        if: always()
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Instalar Allure CLI
+        if: always()
+        run: |
+          curl -o allure.tgz -L \
+            https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
+          tar -xzf allure.tgz
+          echo "$PWD/allure-2.27.0/bin" >> $GITHUB_PATH
+
+      - name: Gerar Allure Report
+        if: ${{ always() && hashFiles('allure-results/*') != '' }}
+        run: allure generate allure-results -o allure-report --clean
+
+      - name: Upload Allure Report
+        if: ${{ always() && hashFiles('allure-report/*') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-web
+          path: allure-report/
