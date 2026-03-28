@@ -1,0 +1,61 @@
+name: API Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    env:
+      ENV: qa
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: python3 -m pip install -r requirements.txt
+
+      - name: Run API tests (Allure results)
+        run: |
+          robot --variable ENV:${ENV} \
+                --listener allure_robotframework:allure-results \
+                --outputdir results/api \
+                api-tests/tests/
+
+      - name: Upload Robot results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-results-api
+          path: results/api/
+
+      - name: Setup Java (Allure)
+        if: always()
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Allure CLI
+        if: always()
+        run: |
+          curl -o allure.tgz -L https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
+          tar -xzf allure.tgz
+          echo "$PWD/allure-2.27.0/bin" >> $GITHUB_PATH
+
+      - name: Generate Allure report
+        if: ${{ always() && hashFiles('allure-results/*') != '' }}
+        run: allure generate allure-results -o allure-report --clean
+
+      - name: Upload Allure report
+        if: ${{ always() && hashFiles('allure-report/*') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-api
+          path: allure-report/

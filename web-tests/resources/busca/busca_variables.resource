@@ -1,7 +1,5 @@
 *** Variables ***
 ${ENV}                dev
-${BASE_URL}           https://blogdoagi.com.br
-${ENV_NAME}           local
 @{SEARCH_ICON_SELECTORS}
 ...    css=button[aria-label="Pesquisar"]
 ...    css=button[aria-label="Search"]

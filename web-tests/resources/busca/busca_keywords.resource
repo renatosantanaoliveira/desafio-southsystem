@@ -18,6 +18,7 @@ Carregar Configuracao De Ambiente
     ${env_file}=    Normalize Path    ${CURDIR}/../config/${ENV}.yaml
     File Should Exist    ${env_file}
     Import Variables    ${env_file}
+    Variable Should Exist    \${BASE_URL}
 
 Fechar Browser
     Close Browser

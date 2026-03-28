@@ -1,0 +1,2 @@
+BASE_URL: https://dog.ceo/api
+ENV_NAME: prod
